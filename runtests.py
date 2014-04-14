@@ -46,10 +46,15 @@ def main():
         settings.configure(**DEFAULT_SETTINGS)
     if hasattr(django, 'setup'):
         django.setup()
-    from django.test.simple import DjangoTestSuiteRunner
-    failures = DjangoTestSuiteRunner(
-        verbosity=1, interactive=True, failfast=False).run_tests(['tests'])
-    sys.exit(failures)
+    if django.VERSION < (1, 7): 
+        from django.test.simple import DjangoTestSuiteRunner
+        failures = DjangoTestSuiteRunner(verbosity=1, interactive=True, failfast=False).run_tests(['tests'])
+        sys.exit(failures)
+    else:
+        from django.test.runner import DiscoverRunner
+        failures = DiscoverRunner(
+            pattern='test*.py', verbosity=1, interactive=True, failfast=False).run_tests(test_labels=None)
+        sys.exit(failures)
 
 
 if __name__ == "__main__":
